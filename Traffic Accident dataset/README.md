@@ -8,7 +8,7 @@
 
 
 
-This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the Traffic Accident dataset (https://www.nhtsa.gov/file-downloads?p=nhtsa/downloads/FARS/).  
+This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the [Traffic Accident dataset](https://www.nhtsa.gov/file-downloads?p=nhtsa/downloads/FARS/).  
 
 ---
 ## Introduction 💡
