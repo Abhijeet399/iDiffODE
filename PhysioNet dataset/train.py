@@ -1,104 +1,115 @@
-
+# train.py
 import argparse
-import os
 import torch
-from torch.utils.data import DataLoader, random_split
 import torch.optim as optim
-
-from dataset import AccidentDataset, AccidentPreprocessor
-from models import AccidentPredictionPipeline
+from dataset import get_dataloaders
+from models import build_model
 from utils import composite_loss, save_checkpoint
+import torch.nn as nn
+from datetime import datetime
+import os
 
-def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument('--csv', required=True, help='path to CSV (traffic accidents) file')
-    p.add_argument('--model', choices=['mlp','rnn','transformer'], default='mlp')
-    p.add_argument('--epochs', type=int, default=200)
-    p.add_argument('--bs', type=int, default=32)
-    p.add_argument('--lr', type=float, default=1e-3)
-    p.add_argument('--wd', type=float, default=1e-5, help='weight decay')
-    p.add_argument('--hidden', type=int, default=128)
-    p.add_argument('--latent', type=int, default=64)
-    p.add_argument('--nhead', type=int, default=4, help='transformer nhead (only used if transformer)')
-    p.add_argument('--nlayers', type=int, default=2, help='transformer nlayers (only used if transformer)')
-    p.add_argument('--rnn_type', choices=['gru','rnn'], default='gru')
-    p.add_argument('--save', default='checkpoints/last.pth')
-    p.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu')
-    return p.parse_args()
+try:
+    from tqdm import tqdm
+except Exception:
+    tqdm = lambda x: x
 
-def main(argv=None):
-    args = parse_args() if argv is None else argv
+def run_training(args):
+    train_loader, val_loader, input_dim, scaler = get_dataloaders(
+        data_dir=args.data_dir,
+        batch_size=args.batch_size,
+        val_split=args.val_split,
+        num_workers=args.num_workers,
+        random_seed=args.seed
+    )
 
-    # Dataset + splits
-    preprocessor = AccidentPreprocessor()
-    dataset = AccidentDataset(args.csv, preprocessor=preprocessor)
-    N = len(dataset)
-    train_size = int(0.8 * N)
-    val_size = N - train_size
-    train_ds, val_ds = random_split(dataset, [train_size, val_size])
-    train_loader = DataLoader(train_ds, batch_size=args.bs, shuffle=True, drop_last=False)
-    val_loader = DataLoader(val_ds, batch_size=args.bs, shuffle=False)
+    model = build_model(model_type=args.model_type,
+                        input_dim=input_dim,
+                        hidden_dim=args.hidden_dim,
+                        latent_dim=args.latent_dim,
+                        timesteps=args.timesteps,
+                        nhead=args.nhead,
+                        num_layers=args.num_layers)
 
-    # Build model
-    encoder_kwargs = {}
-    if args.model == 'transformer':
-        encoder_kwargs = dict(nhead=args.nhead, num_layers=args.nlayers)
-    elif args.model == 'rnn':
-        encoder_kwargs = dict(rnn_type=args.rnn_type)
-
-    input_dim = dataset.X.shape[1]
-    model = AccidentPredictionPipeline(input_dim, hidden_dim=args.hidden, latent_dim=args.latent,
-                                       encoder_type=args.model, **encoder_kwargs)
-    device = torch.device(args.device)
+    device = torch.device('cuda' if torch.cuda.is_available() and not args.force_cpu else 'cpu')
     model.to(device)
 
-    # multi-gpu (optional)
-    if torch.cuda.device_count() > 1 and device.type == 'cuda':
+    if torch.cuda.device_count() > 1 and not args.force_cpu:
         print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
-        model = torch.nn.DataParallel(model)
+        model = nn.DataParallel(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.wd)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-    time_points = torch.linspace(0, 1, 2).to(device)
+    time_points = torch.linspace(0, 1, args.ode_steps).to(device)
 
     best_val = float('inf')
+    os.makedirs(args.ckpt_dir, exist_ok=True)
+
     for epoch in range(args.epochs):
         model.train()
         train_loss = 0.0
-        for batch_x in train_loader:
-            batch_x = batch_x.to(device)
+        for batch in tqdm(train_loader):
+            batch = batch.to(device)
             optimizer.zero_grad()
-            outputs = model(batch_x, time_points)
-            loss = composite_loss(outputs, batch_x)
+            outputs = model(batch, time_points)
+            loss = composite_loss(outputs, batch)
             loss.backward()
             optimizer.step()
-            train_loss += loss.item()
-        train_loss /= max(1, len(train_loader))
+            train_loss += loss.item() * batch.size(0)
+        train_loss = train_loss / len(train_loader.dataset)
 
         model.eval()
         val_loss = 0.0
         with torch.no_grad():
-            for batch_x in val_loader:
-                batch_x = batch_x.to(device)
-                outputs = model(batch_x, time_points)
-                val_loss += composite_loss(outputs, batch_x).item()
-        val_loss /= max(1, len(val_loader))
+            for batch in val_loader:
+                batch = batch.to(device)
+                outputs = model(batch, time_points)
+                loss = composite_loss(outputs, batch)
+                val_loss += loss.item() * batch.size(0)
+        val_loss = val_loss / len(val_loader.dataset)
 
         print(f"Epoch {epoch+1}/{args.epochs}  Train: {train_loss:.6f}  Val: {val_loss:.6f}")
 
-        # checkpoint
-        ckpt = {
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'input_dim': input_dim,
-            'hidden_dim': args.hidden,
-            'latent_dim': args.latent,
-            'encoder_type': args.model,
-            'epochs_trained': epoch+1,
-        }
-        save_checkpoint(ckpt, args.save)
+        # save best
+        if val_loss < best_val or (epoch + 1) % args.save_every == 0:
+            best_val = min(val_loss, best_val)
+            ckpt_name = os.path.join(args.ckpt_dir,
+                                     f"{args.model_type}_ckpt_epoch{epoch+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pth")
+            save_checkpoint({
+                'epoch': epoch + 1,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'input_dim': input_dim,
+                'hidden_dim': args.hidden_dim,
+                'latent_dim': args.latent_dim,
+                'model_type': args.model_type
+            }, ckpt_name)
 
-    return model
+def get_arg_parser():
+    p = argparse.ArgumentParser()
+    p.add_argument('--model_type', choices=['mlp', 'rnn', 'transformer'], required=True)
+    p.add_argument('--data_dir', type=str, default='merged_data')
+    p.add_argument('--batch_size', type=int, default=8)
+    p.add_argument('--val_split', type=float, default=0.2)
+    p.add_argument('--epochs', type=int, default=2000)
+    p.add_argument('--lr', type=float, default=1e-3)
+    p.add_argument('--weight_decay', type=float, default=1e-5)
+    p.add_argument('--hidden_dim', type=int, default=128)
+    p.add_argument('--latent_dim', type=int, default=64)
+    p.add_argument('--ode_steps', type=int, default=2)
+    p.add_argument('--timesteps', type=int, default=1000)
+    p.add_argument('--nhead', type=int, default=4)
+    p.add_argument('--num_layers', type=int, default=2)
+    p.add_argument('--ode_solver', type=str, default='dopri5')
+    p.add_argument('--ode_timepoints', type=int, default=2)
+    p.add_argument('--save_every', type=int, default=25)
+    p.add_argument('--ckpt_dir', type=str, default='checkpoints')
+    p.add_argument('--num_workers', type=int, default=0)
+    p.add_argument('--seed', type=int, default=42)
+    p.add_argument('--force_cpu', action='store_true', help="Force CPU even if CUDA available")
+    return p
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    parser = get_arg_parser()
+    args = parser.parse_args()
+    run_training(args)
