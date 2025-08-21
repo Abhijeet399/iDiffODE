@@ -23,8 +23,8 @@ model multimodal uncertainty. This enables accurate handling of long gaps and as
 ```text
 .
 ├─ README.md
-├─ data/
-│  └─ raw_combined_accidents.csv       # your data
+├─ merged_data/
+│  └─ merged_data.csv                  # your data
 ├─ dataset.py                          # dataset + preprocessing
 ├─ models.py                           # MLP / RNN / Transformer model variants + pipeline factory
 ├─ utils.py                            # losses, helpers, save/load
