@@ -13,12 +13,12 @@ This repository contains the implementation and evaluation of **iDiffODE**, a hy
 ---
 ## Introduction 💡
 Irregularly sampled time series are prevalent in domains such as healthcare, wearable sensing, and geospatial event monitoring. These datasets pose significant challenges for traditional time-series models, which assume uniform sampling and struggle with missing or delayed observations. In this work, we present iDiffODE, a novel continuous-time generative model that explicitly constructs smooth latent trajectories from irregular observations, enabling both accurate reconstruction and realistic simulation of multivariate system states. Our approach integrates a Neural Ordinary Differential Equation latent trajectory, which captures time-aware dynamics between arbitrary timestamps, with a diffusion-based prior in latent space to
-model multimodal uncertainty. This enables accurate handling of long gaps and asynchronous sampling while generating diverse, data-consistent scenarios. We evaluate our method on three representative datasets, such as PhysioNet ICU records, UCI HAR wearable sensor data, and US national transportation safety accident records, demonstrating consistent improvements over the existing methods. Our results demonstrate that iD-
-iffODE and it’s model variants effectively learns continuous latent dynamics and generates time series data even under conditions of severe irregular sampling, positioning it as a highly promising solution for handling irregular time series data in the real world with enhanced generalizability.
+model multimodal uncertainty. This enables accurate handling of long gaps and asynchronous sampling while generating diverse, data-consistent scenarios. We evaluate our method on three representative datasets, such as PhysioNet ICU records, UCI HAR wearable sensor data, and US national transportation safety accident records, demonstrating consistent improvements over the existing methods. Our results demonstrate that iDiffODE and it’s model variants effectively learns continuous latent dynamics and generates time series data even under conditions of severe irregular sampling, positioning it as a highly promising solution for handling irregular time series data in the real world with enhanced generalizability.
 
 ---
 
 ## Repository structure:
+```text
 .
 ├─ README.md
 ├─ data/
@@ -31,7 +31,7 @@ iffODE and it’s model variants effectively learns continuous latent dynamics a
 ├─ run_rnn.py # convenience launcher -> iDiffODE(RNN)
 ├─ run_transformer.py # convenience launcher -> iDiffODE(Transformer)
 └─ evaluate.py # (optional) evaluation script skeleton
-
+```
 ---
 
 ## How to use
@@ -58,5 +58,6 @@ iffODE and it’s model variants effectively learns continuous latent dynamics a
     ```
 
 5.  **Evaluate a saved checkpoint:**
+
     To be uploaded soon [1.1, 1.3.2].
 
