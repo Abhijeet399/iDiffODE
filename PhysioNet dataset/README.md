@@ -8,7 +8,7 @@
 
 
 
-This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the [PhysioNet dataset](hhttps://physionet.org/content/challenge-2012/1.0.0//).  
+This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the [PhysioNet dataset](https://physionet.org/content/challenge-2012/1.0.0//).  
 
 ---
 ## Introduction 💡
