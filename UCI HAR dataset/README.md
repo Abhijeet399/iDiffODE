@@ -8,7 +8,7 @@
 
 
 
-This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the [Human Activity Recognition dataset](hhttps://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones/).  
+This repository contains the implementation and evaluation of **iDiffODE**, a hybrid model that combines **Neural ODEs**, **Diffusion Models**, and **Invertible Neural Networks** for effective modeling of irregularly sampled time-series data for the [Human Activity Recognition dataset](https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones/).  
 
 ---
 ## Introduction 💡
