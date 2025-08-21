@@ -25,7 +25,7 @@ model multimodal uncertainty. This enables accurate handling of long gaps and as
 ├─ README.md
 ├─ data_dir/
 │  └─ train       # your data
-│  └─ tesr       # your data
+│  └─ test        # your data
 ├─ dataset.py                          # dataset + preprocessing
 ├─ models.py                           # MLP / RNN / Transformer model variants + pipeline factory
 ├─ utils.py                            # losses, helpers, save/load
