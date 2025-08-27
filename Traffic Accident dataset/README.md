@@ -32,7 +32,7 @@ model multimodal uncertainty. This enables accurate handling of long gaps and as
 ├─ run_mlp.py                          # convenience launcher -> iDiffODE(MLP)
 ├─ run_rnn.py                          # convenience launcher -> iDiffODE(RNN)
 ├─ run_transformer.py                  # convenience launcher -> iDiffODE(Transformer)
-└─ evaluate.py                         # (optional) evaluation script skeleton
+└─ evaluate.py                         # To be uploaded soon
 
 ```
 ---
