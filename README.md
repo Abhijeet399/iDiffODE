@@ -35,6 +35,17 @@ model multimodal uncertainty. This enables accurate handling of long gaps and as
 ---
 ## Results
 
+### Quantitative Results
+COMPREHENSIVE MODEL PERFORMANCE COMPARISON. ↑ INDICATES HIGHER IS BETTER ; ↓ INDICATES LOWER IS BETTER . BOLD INDICATES BEST PERFORMANCE . HERE IDIFFODE_M IS OUR MODEL PROPOSED USING MLP IN NEURAL ODE, IDIFFODE_R IS OUR MODEL PROPOSED USING RNN IN NEURAL ODE, IDIFFODE_T IS OUR MODEL PROPOSED USING TRANSFORMERS IN NEURAL ODE.
+![Alt text describing the image](https://i.postimg.cc/D0FqcJj6/Screenshot-from-2025-08-31-02-00-37.png)
+
+
+COMPARATIVE ANALYSIS OF THREE ARCHITECTURAL VARIANTS OF OUR PROPOSED FRAMEWORK IDIFFODE_M, IDIFFODE_R AND IDIFFODE_T EVALUATED ON THREE DIVERSE , IRREGULARLY SAMPLED TIME - SERIES DATASETS : TRAFFIC ACCIDENT, PHYSIO_NET, AND UCI_HAR.
+![Alt text describing the image](https://i.postimg.cc/66mWnJ82/Screenshot-from-2025-08-31-02-04-30.png)
+
+
+### Qualitative Resutls
+
 1. [Traffic Accident dataset](https://github.com/Abhijeet399/iDiffODE/blob/main/Traffic%20Accident%20dataset/README.md).     
 2. [PhysioNet dataset](https://github.com/Abhijeet399/iDiffODE/blob/main/PhysioNet%20dataset/README.md).
 3. [Human Activity Recognition dataset](https://github.com/Abhijeet399/iDiffODE/blob/main/UCI%20HAR%20dataset/README.md).
