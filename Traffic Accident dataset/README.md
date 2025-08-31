@@ -64,3 +64,27 @@ model multimodal uncertainty. This enables accurate handling of long gaps and as
 
     To be uploaded soon [1.1, 1.3.2].
 
+---
+
+## Results
+
+### Quantitative Results
+
+
+
+### Qualitative Resutls
+
+This figure represents the Heatmap of the origional and the reconstructed feature vectors:
+![Alt text describing the image](https://i.postimg.cc/hjty1YXh/Reconstructed-Heatmaps.png)
+
+
+This figure represents the Feature-wise value comparision of the origional and the reconstructed feature vectors:
+![Alt text describing the image](https://i.postimg.cc/Jz7pLgQx/Featurewise-value-comparision.png)
+
+This figure represents the Feature-wise absolute error bar chart of the origional and the reconstructed feature vectors:
+![Alt text describing the image](https://i.postimg.cc/0jqCHHQp/Featurewise-absolute-error.png)
+
+This figure represents the Radar plot of the origional and the reconstructed feature vectors:
+![Alt text describing the image](https://i.postimg.cc/yxXTqXg2/radar-plot.png)
+
+
