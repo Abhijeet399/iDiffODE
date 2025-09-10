@@ -90,6 +90,7 @@ This figure represents the Feature-wise absolute error bar chart of the origiona
 ![Alt text describing the image](https://i.postimg.cc/0jqCHHQp/Featurewise-absolute-error.png)
 
 This figure represents the Radar plot of the origional and the reconstructed feature vectors:
+
 ![Alt text describing the image](https://i.postimg.cc/yxXTqXg2/radar-plot.png)
 
 
